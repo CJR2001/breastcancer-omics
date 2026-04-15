@@ -1,0 +1,12 @@
+# Rohdaten nicht ins Repo (zu groß)
+data/raw/
+data/processed/
+
+# R spezifisch
+.Rhistory
+.RData
+.Rproj.user/
+
+# OS
+.DS_Store
+Thumbs.db
