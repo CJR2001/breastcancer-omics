@@ -1,9 +1,3 @@
-# ==============================================
-# 01_load_qc.R
-# CEL Files einlesen + QC vor Normalisierung
-# GSE231629 | Jensen et al. 2023
-# ==============================================
-
 library(affy)
 library(arrayQualityMetrics)
 
