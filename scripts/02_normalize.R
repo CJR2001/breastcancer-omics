@@ -18,7 +18,9 @@ cat("Dimensionen Expression Matrix:", nrow(eset), "Probes x", ncol(eset), "Sampl
 # Normalized Expression Matrix speichern
 dir.create("data/processed", recursive = TRUE, showWarnings = FALSE)
 write.csv(exprs(eset), file = "data/processed/rma_normalized.csv")
+saveRDS(eset, file = "data/processed/eset_normalized.rds")
 cat("Normalisierte Daten gespeichert: data/processed/rma_normalized.csv\n")
+cat("ExpressionSet gespeichert: data/processed/eset_normalized.rds\n")
 
 # QC NACH Normalisierung
 cat("Starte QC nach Normalisierung...\n")
