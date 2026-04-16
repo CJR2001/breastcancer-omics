@@ -39,4 +39,3 @@ outliers_pre <- c("GSM7294872", "GSM7294947", "meisten x in Tabelle in index.htm
 cat("\nBekannte Pre-Norm Outlier (>= 2 Kriterien):\n")
 cat(paste(" -", outliers_pre), sep = "\n")
 cat("\n-> Post-Normalisierungs QC in results/qc_after/ pruefen\n")
-cat("-> Dann 03_annotate.R ausfuehren\n")
