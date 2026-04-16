@@ -1,3 +1,16 @@
+# ==============================================
+# 03_annotate.R
+# Sample-Annotationen laden + Outlier + Subgruppen
+# GSE231629 | Jensen et al. 2023
+#
+# Finale Gruppenstruktur (nach Prof-Feedback):
+#   lumA (n=25), lumB (n=35), lumC (n=13) -> je eigene Gruppe
+#   basL (n=17)                            -> Non-luminal
+#   mApo                                   -> Ausschluss (n=2, zu wenig Power)
+#   normL                                  -> Ausschluss (normales Gewebe)
+#   QC-Outlier: Sample029, Sample104       -> Ausschluss
+# ==============================================
+
 library(GEOquery)
 library(Biobase)
 
@@ -21,11 +34,9 @@ pheno_matched <- pheno[our_gsm, ]
 rownames(pheno_matched) <- sampleNames(eset)
 
 # Saubere Spalten extrahieren
-# cit256 subtype: lumA, lumB, basL, normL, mApo
 pheno_matched$subtype_cit256 <- sub("cit256 subtype: ", "",
                                      pheno_matched$`cit256 subtype:ch1`)
 
-# pam50 subtype: Luminal_A, Luminal_B, Basal-like, Normal-like, HER2-enriched
 pheno_matched$subtype_pam50 <- sub("pam50 subtype: ", "",
                                     pheno_matched$`pam50 subtype:ch1`)
 
@@ -33,49 +44,44 @@ pheno_matched$subtype_pam50 <- sub("pam50 subtype: ", "",
 pheno_matched$rcb <- as.numeric(sub("rcb status: ", "",
                                      pheno_matched$`rcb status:ch1`))
 
-# Binaere pCR Variable: RCB 0 = pCR, RCB 1-3 = non-pCR
+# Binaere pCR Variable
 pheno_matched$pcr <- ifelse(pheno_matched$rcb == 0, "pCR", "non-pCR")
-
-# Non-luminal vs luminal Gruppe (fuer Hauptvergleich)
-# Non-luminal: basL, mApo | Luminal: lumA, lumB
-pheno_matched$luminal_group <- ifelse(
-    pheno_matched$subtype_cit256 %in% c("basL", "mApo"),
-    "Non-luminal",
-    "Luminal"
-)
 
 # PhenoData ans ExpressionSet haengen (laut Prof-Buch Kap. 7.1.1)
 pData(eset) <- pheno_matched
 
-# Subtyp-Verteilung ausgeben
-cat("\nSubtyp-Verteilung (CIT256):\n")
+# Subtyp-Verteilung vor Ausschluss
+cat("\nSubtyp-Verteilung vor Ausschluss:\n")
 print(table(pheno_matched$subtype_cit256))
 
-cat("\nLuminal vs Non-luminal:\n")
-print(table(pheno_matched$luminal_group))
-
-cat("\npCR-Rate gesamt:\n")
-print(table(pheno_matched$pcr))
-
-cat("\npCR-Rate nach Luminal-Gruppe:\n")
-print(table(pheno_matched$luminal_group, pheno_matched$pcr))
-
-# Outlier entfernen (bestaetigt aus qc_before + qc_after)
+# -----------------------------------------------
+# Schritt 1: QC-Outlier entfernen
 # Sample029 = GSM7294872: 3 Kriterien pre-norm, 1 post-norm
 # Sample104 = GSM7294947: 5 Kriterien pre-norm, 2 post-norm
+# -----------------------------------------------
 outliers <- c("GSM7294872_Sample029.CEL.gz", "GSM7294947_Sample104.CEL.gz")
-
-cat("\nEntferne Outlier:\n")
-cat(paste(" -", outliers), sep = "\n")
-
 keep <- !sampleNames(eset) %in% outliers
-eset_clean <- eset[, keep]
+eset <- eset[, keep]
+cat("\nNach QC-Outlier Entfernung:", ncol(eset), "Samples\n")
 
-cat("\nFinaler Datensatz:", ncol(eset_clean), "Samples,", nrow(eset_clean), "Probes\n")
+# -----------------------------------------------
+# Schritt 2: mApo und normL ausschliessen
+# mApo: n=2, zu wenig statistische Power (Prof-Empfehlung)
+# normL: normales Gewebe, kein Tumorsubtyp
+# -----------------------------------------------
+exclude_subtypes <- c("mApo", "normL")
+keep2 <- !pData(eset)$subtype_cit256 %in% exclude_subtypes
+eset_clean <- eset[, keep2]
+cat("Nach Ausschluss mApo + normL:", ncol(eset_clean), "Samples\n")
 
-cat("\nSubtyp-Verteilung nach Outlier-Entfernung:\n")
+# Finale Subtyp-Verteilung
+cat("\nFinale Subtyp-Verteilung:\n")
 print(table(pData(eset_clean)$subtype_cit256))
+
+cat("\npCR-Rate pro Subtyp:\n")
+print(table(pData(eset_clean)$subtype_cit256, pData(eset_clean)$pcr))
 
 # Bereinigten ExpressionSet speichern
 saveRDS(eset_clean, file = "data/processed/eset_clean.rds")
 cat("\nBereinigter ExpressionSet gespeichert: data/processed/eset_clean.rds\n")
+cat("Finale Analysebasis:", ncol(eset_clean), "Samples,", nrow(eset_clean), "Probes\n")
