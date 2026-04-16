@@ -1,7 +1,6 @@
 # ==============================================
 # 03_annotate.R
 # Sample-Annotationen laden + Outlier + Subgruppen
-# GSE231629 | Jensen et al. 2023
 #
 # Finale Gruppenstruktur (nach Prof-Feedback):
 #   lumA (n=25), lumB (n=35), lumC (n=13) -> je eigene Gruppe
