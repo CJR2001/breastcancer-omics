@@ -1,5 +1,5 @@
 # ==============================================
-#
+# 
 # Outputs in results/plots/:
 #   volcano_*.png          - statische Volcano-Plots (ggplot2)
 #   glimma_mds.html        - interaktiver MDS-Plot (Sample-Uebersicht)
@@ -52,9 +52,10 @@ fit2$genes <- data.frame(
 )
 
 # -----------------------------------------------
-# Schritt 1: Statische Volcano-Plots (ggplot2 + ggrepel)
+# Schritt 1: Volcano-Plots (ggplot2 + ggrepel)
+# https://biostatsquid.com/volcano-plots-r-tutorial/
 # -----------------------------------------------
-cat("\n1) Statische Volcano-Plots (ggplot2)...\n")
+cat("\n1) Volcano-Plots (ggplot2)...\n")
 for (contr in contrasts_list) {
     tt <- topTable(fit2, coef = contr, number = Inf,
                    adjust.method = "BH", sort.by = "P")
@@ -96,40 +97,10 @@ for (contr in contrasts_list) {
 }
 
 # -----------------------------------------------
-# Schritt 2a: Statischer MDS-Plot 
+# Schritt 2: Glimma MDS-Plot (interaktiv, HTML)
+# https://bioconductor.org/packages/release/bioc/vignettes/Glimma/inst/doc/limma_edger.html
 # -----------------------------------------------
-cat("\n2a) Statischer MDS-Plot (ggplot2)...\n")
-mds <- plotMDS(exprs(eset), top = 500, plot = FALSE)
-mds_df <- data.frame(
-    dim1    = mds$x,
-    dim2    = mds$y,
-    subtype = as.character(subtype),
-    pcr     = pData(eset)$pcr,
-    row.names = sampleNames(eset)
-)
-
-subtype_colors <- c(basL = "#ff7f00", lumA = "#4daf4a",
-                    lumB = "#377eb8", lumC = "#e41a1c")
-pcr_shapes     <- c("non-pCR" = 16, "pCR" = 15)   # Kreis vs. Quadrat
-
-p_mds <- ggplot(mds_df, aes(x = dim1, y = dim2,
-                             color = subtype, shape = pcr)) +
-    geom_point(size = 3, alpha = 0.85) +
-    scale_color_manual(values = subtype_colors, name = "Subtyp") +
-    scale_shape_manual(values = pcr_shapes,     name = "pCR") +
-    labs(title = "MDS-Plot (Top-500-Gene)",
-         x = paste0("dim1 (", round(mds$var.explained[1] * 100, 1), "% Varianz)"),
-         y = paste0("dim2 (", round(mds$var.explained[2] * 100, 1), "% Varianz)")) +
-    theme_bw() +
-    theme(legend.position = "right")
-
-ggsave("results/plots/mds_static.png", p_mds, width = 7, height = 6, dpi = 150)
-cat("  Gespeichert: results/plots/mds_static.png\n")
-
-# -----------------------------------------------
-# Schritt 2b: Glimma MDS-Plot (interaktiv, HTML)
-# -----------------------------------------------
-cat("\n2b) Glimma MDS-Plot (interaktiv)...\n")
+cat("\n2) Glimma MDS-Plot (interaktiv)...\n")
 glimmaMDS(exprs(eset),
           groups = data.frame(Subtype = as.character(subtype),
                               pCR     = pData(eset)$pcr),
@@ -138,6 +109,7 @@ cat("  Gespeichert: results/plots/glimma_mds.html\n")
 
 # -----------------------------------------------
 # Schritt 3: Heatmap der Top-DEGs (Union aus allen Kontrasten)
+#https://cran.r-project.org/web/packages/pheatmap/pheatmap.pdf
 # -----------------------------------------------
 cat("\n3) Heatmap der Top-DEGs...\n")
 
