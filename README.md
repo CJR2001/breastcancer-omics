@@ -35,7 +35,8 @@ BiocManager::install(c(
     "arrayQualityMetrics",
     "limma",
     "hgu133plus2.db",
-    "Biobase"
+    "Biobase",
+    "Glimma"
 ))
 ```
 
@@ -51,7 +52,9 @@ install.packages(c(
     "RSQLite",
     "statmod",
     "ggplot2",
-    "pheatmap"
+    "ggrepel",
+    "pheatmap",
+    "RColorBrewer"
 ), repos = "https://cloud.r-project.org")
 ```
 
@@ -62,6 +65,11 @@ library(arrayQualityMetrics)
 library(limma)
 library(hgu133plus2.db)
 library(GEOquery)
+library(Glimma)
+library(ggplot2)
+library(ggrepel)
+library(pheatmap)
+library(RColorBrewer)
 ```
 
 ## Ausführung der Skripte
@@ -70,4 +78,5 @@ Rscript scripts/01_load_qc.R      # CEL Files + QC vor Normalisierung
 Rscript scripts/02_normalize.R    # RMA Normalisierung + QC danach
 Rscript scripts/03_annotate.R     # Metadaten + Outlier/Subtyp-Filter
 Rscript scripts/04_deg.R          # limma DEG-Analyse
+Rscript scripts/05_plots.R        # Volcano + Heatmap + Glimma HTMLs
 ```

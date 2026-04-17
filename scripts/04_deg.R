@@ -1,5 +1,4 @@
 # ==============================================
-# 04_deg.R
 # Differentielle Expressionsanalyse mit limma
 #
 # Kontraste (Non-luminal vs jede luminale Subgruppe):
@@ -96,4 +95,3 @@ for (contr in contrasts_list) {
 # fit2-Objekt speichern fuer spaetere Plots (Volcano, Heatmap)
 saveRDS(fit2, file = "data/processed/limma_fit.rds")
 cat("\nlimma Fit-Objekt gespeichert: data/processed/limma_fit.rds\n")
-cat("Alle DEG-Ergebnisse in results/deg/\n")

@@ -10,3 +10,7 @@ data/processed/
 # OS
 .DS_Store
 Thumbs.db
+
+results/plots/glimma_*.html
+
+docs
