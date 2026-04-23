@@ -3,10 +3,7 @@
 Re-analysis of GSE231629 (Jensen et al., NPJ Breast Cancer 2023)
 
 ## Hypothese
-Non-luminale Subtypen (Basal-like, mApo) zeigen im Vergleich zu 
-luminalen Subtypen (LumA, LumB) signifikant unterschiedlich 
-exprimierte Gene, die mit dem Ansprechen auf neoadjuvante 
-Chemotherapie (pCR) assoziiert sind.
+Non-luminale Subtypen (Basal-like, mApo) zeigen im Vergleich zu luminalen Subtypen (LumA, LumB) signifikant unterschiedlich exprimierte Gene, die mit der höheren Rate an pathologischer Komplettremission (pCR) nach neoadjuvanter Chemotherapie assoziiert sind.
 
 ## Datensatz
 - GEO: GSE231629
@@ -20,8 +17,8 @@ Chemotherapie (pCR) assoziiert sind.
 4. QC nach Normalisierung
 5. Sample-Annotation + Outlier/Subtyp-Filter (GEOquery)
 6. DEG Analyse (limma)
-7. Volcano Plot + Heatmap
-8. Pathway Analyse (WikiPathways)
+7. Volcano Plot + Heatmap + MDS (ggplot2, pheatmap, Glimma)
+8. Pathway Analyse — ORA + GSEA (clusterProfiler, MSigDB C5)
 
 ## Setup: Benötigte R-Pakete
 
@@ -36,7 +33,10 @@ BiocManager::install(c(
     "limma",
     "hgu133plus2.db",
     "Biobase",
-    "Glimma"
+    "Glimma",
+    "clusterProfiler",
+    "enrichplot",
+    "msigdbr"
 ))
 ```
 
@@ -54,7 +54,9 @@ install.packages(c(
     "ggplot2",
     "ggrepel",
     "pheatmap",
-    "RColorBrewer"
+    "RColorBrewer",
+    "dplyr",
+    "tibble"
 ), repos = "https://cloud.r-project.org")
 ```
 
@@ -70,6 +72,11 @@ library(ggplot2)
 library(ggrepel)
 library(pheatmap)
 library(RColorBrewer)
+library(clusterProfiler)
+library(enrichplot)
+library(msigdbr)
+library(dplyr)
+library(tibble)
 ```
 
 ## Ausführung der Skripte
@@ -78,5 +85,6 @@ Rscript scripts/01_load_qc.R      # CEL Files + QC vor Normalisierung
 Rscript scripts/02_normalize.R    # RMA Normalisierung + QC danach
 Rscript scripts/03_annotate.R     # Metadaten + Outlier/Subtyp-Filter
 Rscript scripts/04_deg.R          # limma DEG-Analyse
-Rscript scripts/05_plots.R        # Volcano + Heatmap + Glimma HTMLs
+Rscript scripts/05_plots.R        # Volcano + Heatmap + Glimma MDS
+Rscript scripts/06_pathway.R      # ORA + GSEA (clusterProfiler, MSigDB C5)
 ```
